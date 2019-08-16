@@ -3,6 +3,7 @@ public class run {
         System.out.println("experiment1:");
         System.out.println("OneTestSuite");
         OneTestSuite.run();
+        modifyExp.run();
         exp.run();
         PLEDGEexp.run();
 

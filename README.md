@@ -1,54 +1,49 @@
-# Constrained Covering Array Generation
+# 组合测试案例研究实验
 
-This project aims to investigate the impact of different constraint handlers on the execution cost-effectinveness of covering array generation algorithms. Specifically, we implement the following three representative covering array generation algorithms (frameworks):
-
-1. *AETG* (the one-test-at-a-time framework) [1]
-2. *IPO* (the in-parameter-order framework) [2]
-3. *SA* (the evolve-test-suite framework) [3]
-
-and the following four constraint handlers:
-
-1. *Verify*: maintain a list of forbidden tuples, and each partial or full solution during the generation process will be verified against them to prevent the appearance of constraint violation.
-2. *Solver*: encode constraints and solutions into a formula and apply an existing constraint satisfaction solver to check the formula's validity.
-3. *Tolerate*: incorporate a penalty term into the fitness function to include invalid solutions in the search space, but penalise them in favour of valid solutions (can only be combined with *SA*).
-4. *Replace*: generate a covering array without considering constraints, and then resolve conflicts by replacing invalid test cases by a set of valid ones to remove constraint violations while retaining combination coverage 
-
-## Experimental Data
-
-The experiment is conducted on a well-known benchmark of constrained covering array generation. This benchmark consists of 35 test models, each of which has a model file `name.model` and a constraint file `name.constraints`. The formats of these two files are the same as the inputs of [CASA](https://cse.unl.edu/~citportal/citportal/loadTool?page=casa).
-
-The raw data is given in the `/data` directory of this project, where each plain text file recoreds the results for a test model (every varaint of AETG and SA is repeated 30 times, while the determinstic IPO is only executed once). The format of each data file is as follows:
-
+本项目包括两个实验，一是面向敏捷开发的测试用例生成和排序，二是面向故障群集的测试用例生成
+## 实验1
+研究在面向敏捷开发的测试用例生成和排序上，CTester平台在多大程度上优于现有组合测试工具。
+本实验有5个实验方法，分别是一次生成整表的方法、修正测试用例方法、通过种子重新生成的方法、PLEDGE工具方法和CTester平台方法
+实验对象如下：
 ```
-apache         # name of the test model
-2-way
-Verify         # constraint handler
-42 32.427S     # obtained test suite size and execution cost in each run 
-44 23.12S
-...
-Solver
-42 2M50.126S
-46 3M15.061S
-...
-Replace
-39 19.374S
-37 19.109S
-...
+实验对象名 参数和取值情况 测试阶段数 模型变更情况
+M1	        4^8	          2	         无
+M2	        4^8	          2	         第2阶段参数P1取值个数减一
+M3	        4^8	          6	         第2阶段参数P1取值个数减一
+M4	        4^8	          6	         第2阶段参数P1取值个数减一
+                                 第3阶段参数P2取值个数加一
+                                 第4阶段新增参数P9
+                                 第5阶段移除参数P8
+M5	        6^20	         2	         无
+M6	        6^20	         2	         第2阶段参数P1取值个数减一
+M7	        6^20	         6	         第2阶段参数P1取值个数减一
+M8	        6^20         	6	         第2阶段参数P1取值个数减一
+                                 第3阶段参数P2取值个数加一
+                                 第4阶段新增参数P21
+                                 第5阶段移除参数P20
 ```
 
 
-## Usage
+## 实验2
+研究在故障检测效率上，自适应的覆盖表生成方法在多大程度上优于传统的整表生成方法。
+我们的实验方法有两种，一是自适应的测试用例生成，每次生成若干条测试用例，接着立即执行这些测试用例，并把执行结果反馈给生成程序。；二是传统的覆盖表生成方法，先生成完整的t维覆盖表，然后再执行，在生成过程中未使用测试用例的执行结果信息。
+实验对象如下，每个模型的故障元组详细信息见`fault.txt`：
+```
+模型名称	 参数和取值情况	 故障元组数目
+M1	      2^10	          2
+M2	      2^10	          10
+M3	      2^10	          20
+M4	      4^20	          2
+M5	      4^20	          10
+M6	      4^20	          20
+M7	      5^30	          2
+M8	      5^30	          10
+M9	      5^30	          20
+M10	     5^30	          40
+```
 
-To generate a constraind 2-way covering array by a given algorithm and a given constraint handler, run
+## 使用方式
+在`run.java`中运行它的main函数
 
-`java -jar CCAG.jar`
-
-and then follow the instructions displayed in the console.
-
-## Reference
-
-[1] M. B. Cohen, M. B. Dwyer, and J. Shi, “Constructing interaction test suites for highly-configurable systems in the presence of constraints: A greedy approach,” IEEE Transactions on Software Engineering, vol. 34, no. 5, pp. 633–650, 2008.
-
-[2] Y. Lei, R. N. Kacker, D. R. Kuhn, V. Okun, and J. Lawrence, “IPOG/IPOG-D: efficient test generation for multi-way combinatorial testing,” Software Testing, Verification and Reliability, vol. 18, no. 3, pp. 125–148, 2008.
-
-[3] B. J. Garvin, M. B. Cohen, and M. B. Dwyer, “Evaluating improvements to a meta-heuristic search for constrained interaction testing,” Empirical Software Engineering, vol. 16, no. 1, pp. 61–102, 2010.
+## 组合测试服务
+在`service`目录下，包含3个服务，分别是生成、更新种子和更新权重，使用Spring Boot开发，可直接生成Docker镜像。

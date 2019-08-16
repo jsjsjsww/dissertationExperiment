@@ -46,7 +46,7 @@ public class forPLEDGE {
 
   // call PLEDGE tool through command line, and save result to out.txt
   private static void runPLEDGE(String modelFile){
-    String command = "java -jar PLEDGE.jar generate_products -fm " + modelFile + " -o out.txt -timeAllowedMS 1000 -nbProds 5 -dimacs";
+    String command = "java -jar PLEDGE.jar generate_products -fm " + modelFile + " -o out.txt -timeAllowedMS 1000 -nbProds 10 -dimacs";
    // System.out.println(System.getProperty("user.dir"));
     Runtime runtime = Runtime.getRuntime();
     try{
@@ -99,6 +99,11 @@ public class forPLEDGE {
   }
 
   public static void main(String[] args){
-   forPLEDGE.runPLEDGETool(8, new int[]{4,4,4,4,4,4,4,4});
+   ArrayList<int[]> res = forPLEDGE.runPLEDGETool(8, new int[]{4,4,4,4,4,4,4,4});
+   for(int[] ts:res){
+     for(int i = 0; i < ts.length; i++)
+       System.out.print(ts[i] + " ");
+     System.out.println();
+   }
   }
 }
